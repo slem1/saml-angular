@@ -18,38 +18,38 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * Rest security configuration for /api/
-     */
-    @Configuration
-    @Order(1)
-    public static class RestApiSecurityConfig extends WebSecurityConfigurerAdapter {
-
-        private static final String apiMatcher = "/api/**";
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-
-            http.addFilterBefore(new JwtAuthenticationFilter(apiMatcher, super.authenticationManager()), UsernamePasswordAuthenticationFilter.class);
-
-            http.antMatcher(apiMatcher).authorizeRequests()
-                    .anyRequest()
-                    .authenticated();
-        }
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth.authenticationProvider(new JwtAuthenticationProvider());
-        }
-    }
-
-    /**
-     * Saml security config
-     */
-    @Configuration
-    @Import(SamlSecurityConfig.class)
-    public static class SamlConfig {
-
-    }
+//    /**
+//     * Rest security configuration for /api/
+//     */
+//    @Configuration
+//    @Order(1)
+//    public static class RestApiSecurityConfig extends WebSecurityConfigurerAdapter {
+//
+//        private static final String apiMatcher = "/api/**";
+//
+//        @Override
+//        protected void configure(HttpSecurity http) throws Exception {
+//
+//            http.addFilterBefore(new JwtAuthenticationFilter(apiMatcher, super.authenticationManager()), UsernamePasswordAuthenticationFilter.class);
+//
+//            http.antMatcher(apiMatcher).authorizeRequests()
+//                    .anyRequest()
+//                    .authenticated();
+//        }
+//
+//        @Override
+//        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//            auth.authenticationProvider(new JwtAuthenticationProvider());
+//        }
+//    }
+//
+//    /**
+//     * Saml security config
+//     */
+//    @Configuration
+//    @Import(SamlSecurityConfig.class)
+//    public static class SamlConfig {
+//
+//    }
 
 }
