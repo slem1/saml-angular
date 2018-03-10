@@ -20,13 +20,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.saml.SAMLAuthenticationProvider;
-import org.springframework.security.saml.SAMLBootstrap;
-import org.springframework.security.saml.SAMLEntryPoint;
-import org.springframework.security.saml.SAMLLogoutFilter;
-import org.springframework.security.saml.SAMLLogoutProcessingFilter;
-import org.springframework.security.saml.SAMLProcessingFilter;
+import org.springframework.security.saml.*;
 import org.springframework.security.saml.context.SAMLContextProviderImpl;
+import org.springframework.security.saml.context.SAMLContextProviderLB;
 import org.springframework.security.saml.key.JKSKeyManager;
 import org.springframework.security.saml.key.KeyManager;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
@@ -82,12 +78,13 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     public WebSSOProfileOptions defaultWebSSOProfileOptions() {
         WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
         webSSOProfileOptions.setIncludeScoping(false);
+        webSSOProfileOptions.setRelayState("http://localhost:4200");
         return webSSOProfileOptions;
     }
 
     @Bean
     public SAMLEntryPoint samlEntryPoint() {
-        SAMLEntryPoint samlEntryPoint = new SAMLEntryPoint();
+        SAMLEntryPoint samlEntryPoint = new SamlWithRelayStateEntryPoint();
         samlEntryPoint.setDefaultProfileOptions(defaultWebSSOProfileOptions());
         return samlEntryPoint;
     }
@@ -105,8 +102,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler() {
         SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler =
-                new SavedRequestAwareAuthenticationSuccessHandler();
-        successRedirectHandler.setDefaultTargetUrl("/");
+                new SAMLRelayStateSuccessHandler();
         return successRedirectHandler;
     }
 
@@ -154,7 +150,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId("SamlJwtSampleEntityId");
+        metadataGenerator.setEntityId("AngularSamlJwtSampleEntityId");
         metadataGenerator.setExtendedMetadata(extendedMetadata());
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());
@@ -281,7 +277,13 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SAMLContextProviderImpl contextProvider() {
-        return new SAMLContextProviderImpl();
+        SAMLContextProviderLB samlContextProviderLB = new SAMLContextProviderLB();
+        samlContextProviderLB.setScheme("http");
+        samlContextProviderLB.setServerName("localhost");
+        samlContextProviderLB.setServerPort(8080);
+        samlContextProviderLB.setIncludeServerPortInRequestURL(true);
+        samlContextProviderLB.setContextPath("/");
+        return samlContextProviderLB;
     }
 
     // SAML 2.0 WebSSO Assertion Consumer

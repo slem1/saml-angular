@@ -7,6 +7,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import fr.sle.config.SecurityConstant;
+import fr.sle.dto.ApiToken;
 import org.joda.time.DateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @GetMapping("/token")
-    public ResponseEntity<String> login() throws JOSEException {
+    public ResponseEntity<ApiToken> token() throws JOSEException {
 
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -44,7 +45,9 @@ public class AuthController {
             SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSetBuilder.build());
             signedJWT.sign(new MACSigner(SecurityConstant.JWT_SECRET));
 
-            return new ResponseEntity<>(signedJWT.serialize(), HttpStatus.OK);
+            ApiToken apiToken = new ApiToken(signedJWT.serialize());
+
+            return new ResponseEntity<>(apiToken, HttpStatus.OK);
         }
     }
 }

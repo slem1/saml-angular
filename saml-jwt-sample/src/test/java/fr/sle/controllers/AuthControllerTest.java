@@ -2,6 +2,7 @@ package fr.sle.controllers;
 
 import com.nimbusds.jose.JOSEException;
 import fr.sle.WithMockSaml;
+import fr.sle.dto.ApiToken;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,10 +24,10 @@ public class AuthControllerTest {
 
         final AuthController authController = new AuthController();
 
-        final ResponseEntity<String> responseEntity = authController.login();
+        final ResponseEntity<ApiToken> responseEntity = authController.token();
 
         Assert.assertEquals(HttpStatus.OK.value(), responseEntity.getStatusCodeValue());
         Assert.assertNotNull(responseEntity.getBody());
-        Assert.assertTrue(responseEntity.getBody().length() > 0);
+        Assert.assertTrue(responseEntity.getBody().getToken().length() > 0);
     }
 }
