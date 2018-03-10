@@ -370,12 +370,14 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf()
                 .disable();
+
         http
                 .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
                 .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
 
         http
                 .authorizeRequests()
+                .antMatchers("/auth/token").permitAll()
                 .antMatchers("/error").permitAll()
                 .antMatchers("/saml/**").permitAll()
                 .anyRequest().authenticated();
