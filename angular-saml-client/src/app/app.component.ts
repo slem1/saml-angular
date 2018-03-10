@@ -14,7 +14,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.httpClient.get('/service/auth/token').subscribe(r => console.log(r));
+    this.httpClient.get('/service/auth/token')
+      .subscribe(r => console.log(r), error => console.log(error));
 
   }
 
