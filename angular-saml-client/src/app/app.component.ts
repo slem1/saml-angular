@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {HttpErrorResponse, HttpResponse} from "@angular/common/http/src/response";
+import {HttpErrorResponse} from "@angular/common/http/src/response";
 import {ApiToken} from "./ApiToken";
 
 @Component({
@@ -12,6 +12,14 @@ export class AppComponent implements OnInit {
 
   title = 'app';
 
+  apiToken: string;
+
+  showUnauthorizedMessage: boolean;
+
+  apiResult;
+
+  logoutSuccess: boolean
+
   constructor(private httpClient: HttpClient) {
   }
 
@@ -19,23 +27,39 @@ export class AppComponent implements OnInit {
 
     this.httpClient.get('/service/auth/token')
       .subscribe(
-          r => console.log(r),
-          error => this.handleTokenError(error));
+        r => this.handleTokenSuccess(r),
+        error => this.handleTokenError(error));
 
   }
 
-
-  handleTokenSuccess(response: HttpResponse<ApiToken>){
-    console.log(response.body);
-    localStorage.setItem("apiToken", response.body.token);
+  handleTokenSuccess(apiToken: ApiToken) {
+    this.apiToken = apiToken.token;
+    localStorage.setItem("apiToken", apiToken.token);
+    this.callApi();
   }
 
   handleTokenError(error: HttpErrorResponse) {
 
-    if(error.status === 401){
-      window.location.replace('http://localhost:8080/saml/login')
+    if (error.status === 401) {
+      this.showUnauthorizedMessage = true;
+      setTimeout(() => window.location.replace('http://localhost:8080/saml/login'), 4000);
     }
+  }
 
+  callApi() {
+    const apiToken = localStorage.getItem("apiToken");
+
+    this.httpClient.get('/service/api/mycontroller/', {
+      headers: {
+        "x-auth-token": apiToken
+      }
+    }).subscribe(r => this.apiResult = JSON.stringify(r));
+  }
+
+  logout() {
+    console.log('logout');
+    localStorage.removeItem('apiToken');
+    this.httpClient.get('service/saml/logout').subscribe(() => this.logoutSuccess = true);
   }
 
 

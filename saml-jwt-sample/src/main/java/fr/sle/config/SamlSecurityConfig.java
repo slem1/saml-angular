@@ -78,7 +78,8 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     public WebSSOProfileOptions defaultWebSSOProfileOptions() {
         WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
         webSSOProfileOptions.setIncludeScoping(false);
-        webSSOProfileOptions.setRelayState("http://localhost:4200");
+        // Relay state can also be set here
+        // webSSOProfileOptions.setRelayState("...");
         return webSSOProfileOptions;
     }
 
@@ -150,7 +151,8 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId("AngularSamlJwtSampleEntityId");
+        metadataGenerator.setEntityId("AngularSamlJwtSampleEntityId2");
+        metadataGenerator.setEntityBaseURL("http://localhost:8080");
         metadataGenerator.setExtendedMetadata(extendedMetadata());
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());
@@ -358,7 +360,7 @@ public class SamlSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth
                 .authenticationProvider(samlAuthenticationProvider());
     }

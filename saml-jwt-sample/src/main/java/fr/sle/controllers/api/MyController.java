@@ -4,6 +4,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author slemoine
  */
@@ -12,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyController {
 
     @GetMapping
-    public String getValue(){
-        return "The bat is in the cave !";
+    public Map<String, String> getValue() {
+        Map<String, String> response = new HashMap<>();
+        response.put("data", "a chunk of data");
+        return response;
     }
 }
