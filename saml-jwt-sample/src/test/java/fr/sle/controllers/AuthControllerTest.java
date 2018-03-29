@@ -24,10 +24,9 @@ public class AuthControllerTest {
 
         final AuthController authController = new AuthController();
 
-        final ResponseEntity<ApiToken> responseEntity = authController.token();
+        final ApiToken apiToken = authController.token();
 
-        Assert.assertEquals(HttpStatus.OK.value(), responseEntity.getStatusCodeValue());
-        Assert.assertNotNull(responseEntity.getBody());
-        Assert.assertTrue(responseEntity.getBody().getToken().length() > 0);
+        Assert.assertNotNull(apiToken);
+        Assert.assertTrue(apiToken.getToken().length() > 0);
     }
 }

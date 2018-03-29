@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @GetMapping("/token")
-    public ResponseEntity<ApiToken> token() throws JOSEException {
+    public ApiToken token() throws JOSEException {
 
         final DateTime dateTime = DateTime.now();
 
@@ -39,9 +39,6 @@ public class AuthController {
         SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSetBuilder.build());
         signedJWT.sign(new MACSigner(SecurityConstant.JWT_SECRET));
 
-        ApiToken apiToken = new ApiToken(signedJWT.serialize());
-
-        return new ResponseEntity<>(apiToken, HttpStatus.OK);
-
+        return new ApiToken(signedJWT.serialize());
     }
 }
