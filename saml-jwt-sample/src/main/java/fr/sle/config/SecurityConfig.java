@@ -2,6 +2,7 @@ package fr.sle.config;
 
 import fr.sle.config.jwt.JwtAuthenticationFilter;
 import fr.sle.config.jwt.JwtAuthenticationProvider;
+import org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
@@ -38,8 +39,29 @@ public class SecurityConfig {
         }
 
         @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        protected void configure(AuthenticationManagerBuilder auth) {
             auth.authenticationProvider(new JwtAuthenticationProvider());
+        }
+    }
+
+    /**
+     * Rest security configuration for /api/
+     */
+    @Configuration
+    @Order(2)
+    public static class AuthSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        private static final String apiMatcher = "/auth/token";
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+
+            http
+                    .exceptionHandling()
+                    .authenticationEntryPoint(new Http401AuthenticationEntryPoint("SAML2.0 - WEBSSO"));
+
+            http.antMatcher(apiMatcher).authorizeRequests()
+                    .antMatchers("**").not().anonymous();
         }
     }
 

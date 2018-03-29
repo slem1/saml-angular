@@ -28,26 +28,20 @@ public class AuthController {
     @GetMapping("/token")
     public ResponseEntity<ApiToken> token() throws JOSEException {
 
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final DateTime dateTime = DateTime.now();
 
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } else {
+        //build claims
+        JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder();
+        jwtClaimsSetBuilder.expirationTime(dateTime.plusMinutes(120).toDate());
+        jwtClaimsSetBuilder.claim("APP", "SAMPLE");
 
-            final DateTime dateTime = DateTime.now();
+        //signature
+        SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSetBuilder.build());
+        signedJWT.sign(new MACSigner(SecurityConstant.JWT_SECRET));
 
-            //build claims
-            JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder();
-            jwtClaimsSetBuilder.expirationTime(dateTime.plusMinutes(120).toDate());
-            jwtClaimsSetBuilder.claim("APP", "SAMPLE");
+        ApiToken apiToken = new ApiToken(signedJWT.serialize());
 
-            //signature
-            SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSetBuilder.build());
-            signedJWT.sign(new MACSigner(SecurityConstant.JWT_SECRET));
+        return new ResponseEntity<>(apiToken, HttpStatus.OK);
 
-            ApiToken apiToken = new ApiToken(signedJWT.serialize());
-
-            return new ResponseEntity<>(apiToken, HttpStatus.OK);
-        }
     }
 }
