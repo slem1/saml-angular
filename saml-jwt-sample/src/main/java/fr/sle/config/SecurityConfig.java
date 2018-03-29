@@ -61,7 +61,7 @@ public class SecurityConfig {
                     .authenticationEntryPoint(new Http401AuthenticationEntryPoint("SAML2.0 - WEBSSO"));
 
             http.antMatcher(apiMatcher).authorizeRequests()
-                    .antMatchers("**").not().anonymous();
+                    .anyRequest().authenticated();
         }
     }
 
