@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
 
     this.httpClient.get('/service/auth/token')
       .subscribe(
-        r => this.handleTokenSuccess(r),
+        r => this.handleTokenSuccess(r as ApiToken),
         error => this.handleTokenError(error));
 
   }
